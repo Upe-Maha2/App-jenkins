@@ -1,48 +1,34 @@
 pipeline {
-    agent any
-
-    environment {
-        NODE_ENV = "production"
+    agent {
+        docker {
+            image 'node:18-alpine'
+        }
     }
 
     stages {
-
-        stage('Checkout') {
-            steps {
-                echo "Cloning repository..."
-                checkout scm
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
-                echo "Installing npm dependencies..."
                 sh 'npm install'
             }
         }
 
         stage('Test') {
             steps {
-                echo "Running tests (if any)..."
-                sh 'npm test || echo "No tests found, skipping"'
+                sh 'npm test'
             }
         }
 
         stage('Build') {
             steps {
-                echo "Building the project..."
                 sh 'npm run build'
             }
         }
-
     }
 
     post {
-        success {
-            echo "✅ Build Successful!"
-        }
         failure {
-            echo "❌ Build Failed — Check console output."
+            echo '❌ Build Failed — Check console output.'
         }
     }
 }
+
